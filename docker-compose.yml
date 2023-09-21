@@ -2,7 +2,7 @@ version: "3.7"
 services:
   chal:
     build: .
-    container_name: "<container_name>"
+    container_name: "Challenge_chal_container"
     volumes:
     - ./db.sqlite3:/code/db.sqlite3
     expose:
@@ -12,12 +12,12 @@ services:
 
   nginx:
     image: nginx
-    container_name: "<chal_nginx>"
+    container_name: "Challenge_nginx_container"
     volumes:
       - "./nginx.default:/etc/nginx/conf.d/default.conf"
       - "./static:/var/www/static"
     ports:
-    - "10000:80"
+    - "11001:80"
     networks:
       - my_network
 
