@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}<title>TITLE</title>{% endblock %}
+
+{% block modal %}
+    <div class="modal fade" id="explanation" tabindex="-1" role="dialog" aria-labelledby="explanation_title"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Erklärung</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body px-5">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container text-center mt-5">
+        <!-- Explanation for the user -->
+        <p>Welcome to our Vigenère Cipher Tool! Encrypt and decrypt messages using the Vigenère cipher. Enter your message and keyword, choose to encrypt or decrypt, and we'll handle the rest. Can you decrypt our challenge words with the provided keys?</p>
+
+
+        <div class="row">
+            <!-- Left List: Encrypted words -->
+            <div class="col-md-4" style="background-color: #f0f0f0; padding: 15px;">
+                <h3 style="color: #333;">Encrypted words:</h3>
+                <ul>
+                    <li style="color: red;">CXHAE</li>
+                    <li style="color: red;">UOMGFTRU IZXPXVJKHK</li>
+                    <li style="color: red;">HSUYI XYVOIMYS</li>
+                    <li style="color: red;">IVPBTBEXEGTY</li>
+                </ul>
+            </div>
+            
+            <!-- Middle: Encrypter Form -->
+            <div class="col-md-4" style="background-color: #e0e0e0; padding: 15px;">
+                <h1 style="color: #333;">Vigenère Cipher</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="plaintext">Plaintext:</label>
+                    <input type="text" name="plaintext" style="width: 100%; padding: 5px;"><br>
+                    <label for="keyword">Keyword:</label>
+                    <input type="text" name="keyword" style="width: 100%; padding: 5px;"><br>
+                    <input type="radio" name="action" value="encrypt" checked> Encrypt
+                    <input type="radio" name="action" value="decrypt"> Decrypt<br>
+                    <input type="submit" value="GO!" style="background-color: #007bff; color: #fff; padding: 5px 15px; border: none; margin-top: 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s;">
+                </form>
+                <h2 style="color: #333;">Result:</h2>
+                {{ ciphertext }}
+            </div>
+            
+            <!-- Right List: Keys -->
+            <div class="col-md-4" style="background-color: #f0f0f0; padding: 15px;">
+                <h3 style="color: #333;">Keys:</h3>
+                <ul>
+                    <li style="color: green;">Computer</li>
+                    <li style="color: green;">Germany</li>
+                    <li style="color: green;">Future</li>
+                    <li style="color: green;">Apple</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Button to open the popup -->
+        <button id="submitWordButton" class="btn btn-primary" onclick="openPopup()"style="margin-top: 20px;">Submit decrypted word/s</button>
+        
+        <!-- Popup dialog (hidden by default) -->
+        <div id="wordPopup" style="display: none;">
+            <p>Enter a word:</p>
+            <input type="text" id="wordInput">
+            <button onclick="checkWord()" style="margin-top: 5px;">Submit</button>
+        </div>
+        <!-- Result message (hidden by default) -->
+        <div id="resultMessage" style="display: none;"></div>
+    </div>
+    <!-- Add JavaScript/jQuery here -->
+    <script>
+        function openPopup() {
+            console.log("Opening popup");
+            document.getElementById('wordPopup').style.display = 'block';
+            // Clear any previous result message
+            document.getElementById('resultMessage').style.display = 'none';
+        }
+
+        function checkWord() {
+            console.log("Checking word");
+            const wordInput = document.getElementById('wordInput').value.trim();
+    
+            // Get the CSRF token from the page's HTML
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+            // Send the entered word and CSRF token to your Django view for validation
+            $.ajax({
+                type: "POST",
+                url: "/validate_word/",
+                data: {
+                    'word': wordInput,
+                    'csrfmiddlewaretoken': csrfToken  // Include the CSRF token in the request
+                },
+                success: function(response) {
+                    console.log("Received response:", response);
+                    const resultMessage = document.getElementById('resultMessage');
+                    if (response.correct) {
+                        resultMessage.style.color = 'green';
+                        resultMessage.textContent = 'THAT\'S CORRECT!';
+                    } else {
+                        resultMessage.style.color = 'red';
+                        resultMessage.textContent = 'Incorrect word. Try again.';
+                    }
+                    resultMessage.style.display = 'block';
+                    document.getElementById('wordPopup').style.display = 'none';
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            if (location.href.includes("start")) {
+                $('#explanation').modal('show');
+            }
+        });
+    </script>
+{% endblock %}

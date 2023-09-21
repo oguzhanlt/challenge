@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block title %}{% endblock %}
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'libs/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    {% block head %}{% endblock %}
+</head>
+<body class="page d-flex flex-column min-vh-100">
+{% block modal %}{% endblock %}
+
+{% include 'header.html' %}
+
+
+<div class="main pb-5">
+    {% block content %}{% endblock %}
+    {% csrf_token %}
+</div>
+
+{% include 'footer.html' %}
+<script src="{% static 'libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'libs/bootstrap/bootstrap.min.js' %}"></script>
+<script src="{% static 'libs/swal/swal.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
